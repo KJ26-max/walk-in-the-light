@@ -1,0 +1,461 @@
+import { useState, useEffect, useRef } from "react";
+
+const VERSES = [
+  { text: "This is the day the Lord has made; let us rejoice and be glad in it.", ref: "Psalm 118:24" },
+  { text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you.", ref: "Jeremiah 29:11" },
+  { text: "The Lord is my shepherd; I shall not want.", ref: "Psalm 23:1" },
+  { text: "Trust in the Lord with all your heart and lean not on your own understanding.", ref: "Proverbs 3:5" },
+  { text: "Come to me, all you who are weary and burdened, and I will give you rest.", ref: "Matthew 11:28" },
+  { text: "I can do all this through him who gives me strength.", ref: "Philippians 4:13" },
+  { text: "Be strong and courageous. Do not be afraid, for the Lord your God will be with you.", ref: "Joshua 1:9" },
+];
+
+const ENTRIES = [
+  { id:-24, date:"October 21, 2001", title:"Thank You Jesus Savior for Keeping Me", pain:"", perspective:"Mom is comfortable and happy in Georgia. Her happiness is all that I want and pray for — and the same for all my family members and those around the world.", promise:"I have not written in my journal in some time and I am at a loss for words. But I would like to say thank you Jesus Savior for keeping me, hearing my prayers and the abundant blessings that you provide. Have mercy Jesus. I love you.", scripture:"Psalm 136:1" },
+  { id:-23, date:"August 22, 2001", title:"Stressed But Still Standing", pain:"I am not feeling well — physically and emotionally stressed. I have a cold and was out sick. I told my counselor I was feeling somewhat depressed again — not sure if it was the cold or stress from work.", perspective:"My counselor visit was good as usual. I composed a list of concerns — therapy, household work, smoking, medication, savings and companionship. Caleb and Nathanael both get on my nerves — two very selfish men in my life. Liam is getting divorced and may move out of state.", promise:"I want to save money. I watched Oprah and learned 4 steps to financial control. I am moving toward stopping smoking. Thank you Jesus. Amen.", scripture:"2 Corinthians 4:8" },
+  { id:-22, date:"May 10, 2001", title:"I Know I Deserve It", pain:"I am still not totally comfortable saying I deserve things — but I am working on it.", perspective:"Today I received a 10% raise and a merit raise for my hard work. I owe it all to you dear God. You have answered so many prayers.", promise:"I try not to make the same mistakes over and over. I know I deserve it and I feel very good about it. Thank you Jesus. Have mercy on my soul. Amen.", scripture:"Proverbs 31:31" },
+  { id:-21, date:"November 30, 2000", title:"Fill My Cup Lord", pain:"", perspective:"Listening to CeCe Winans I realized Fill My Cup Lord was about me and everyone God has created. Every human has a need to be needed — a yearning for fulfillment. And God wants to be that need.", promise:"I pray for God to fill my cup. You are the only one I need. Fill my cup Lord — fill it up and make me whole. Thanksgiving was wonderful. Dad was there in spirit. Thank you Lord. Amen.", scripture:"Psalm 23:5" },
+  { id:-20, date:"October 15, 2000", title:"Goals and Priorities", pain:"I would like to further my education but it is not possible right now. Miriam's education comes first — she should not pay for decisions I made.", perspective:"I want a new car by my 30th birthday. I want Miriam to see that she can do anything she wants as long as she works hard and praises God.", promise:"I would like love from someone who can love me back just as much. When the time is right you will provide that. God bless my little angel Miriam. Amen.", scripture:"Jeremiah 29:11" },
+  { id:-13, date:"October 14, 2000", title:"Picture Day", pain:"", perspective:"Today was picture day for Miriam. She said it was nice. I hope they came out just as beautiful as she is. I cannot believe I have a daughter in the 3rd grade — what a wonder and what a blessing.", promise:"You have been so very good to me. Now I live each day even stronger and more willing to serve my God. When Miriam comes to New Jersey on the 27th I am thinking of going to take pictures with her. God willing. Thank you for awareness and another day.", scripture:"3 John 1:4" },
+  { id:-12, date:"October 13, 2000", title:"I Leave That In Your Hands", pain:"Today is Silas's birthday. He was very upset with me for not being there at midnight. He always tries to make me feel so bad — sometimes it works. I think he got me again. I apologized but that is never enough for him.", perspective:"Wednesday night I met David at the gas station — a 25-year-old minister. He called me and really woke up my spirit. I felt God speaking through him. We had dinner in New Jersey and covered a lot of ground — life, people, friends and the Bible.", promise:"Stephen has a court date today. His friends claim there is a misunderstanding — if so Lord work it out for him. I leave it all in your hands — only you know what is best. Guide me dear God and place me in the direction you want me in. Amen.", scripture:"Proverbs 3:6" },
+  { id:-11, date:"October 12, 2000", title:"Charge Your Angels Out to Them", pain:"Grandmother Naomi will be burying her sister today. I pray she holds up at the funeral. All of these deaths are weighing heavy on her.", perspective:"I ask that you charge your heavenly angels out to them both. Stephen also has matters before the court. Dear God you will do what is best.", promise:"Be their rock during this time. I am grateful and shall not take advantage of your love. Amen.", scripture:"Psalm 91:11" },
+  { id:-10, date:"October 11, 2000", title:"Better Than Therapy", pain:"Grandmother Naomi is not doing well after losing her sister. She needs you most at this moment.", perspective:"Reading the Bible and Bible study has been really good for me — better than going to my counselor for therapy. I did not know how much comfort I could get from learning the word.", promise:"Now I live each day even stronger and more willing to serve my God. I truly know that I am making Him happy — which is a wonder in itself. Amen.", scripture:"Psalm 119:105" },
+  { id:-9, date:"October 10, 2000", title:"God Does Not Make Mistakes", pain:"Grandmother Naomi's only living sister is now gone. So many deaths in my family lately. I wonder what it all means. And I ask for a special prayer — I would like to stop smoking dear Lord. I don't want to anymore. Grant me the courage to change the things that I can.", perspective:"Bible study with Mary and Samuel was small but very intimate and wonderful. Learning the word gives you a new outlook on things you already know. Miriam is adjusting very nicely. I will not question God's will.", promise:"God I pray you give Grandmother Naomi strength to go on. My great aunt Grace is now an angel and God does not make mistakes. Grant me courage to change the things I can. Amen.", scripture:"Isaiah 55:8" },
+  { id:-8, date:"October 9, 2000", title:"Be Careful What You Pray For", pain:"Dear Lord send a special blessing to Grandmother Naomi — her sister Grace passed away today and her brother Elijah is dying. She will be the only one left of 13 brothers and sisters. At the play yesterday I was unexpectedly a wreck — it was as if my life was being reenacted on stage.", perspective:"I went to see a play called 'Be Careful What You Pray For' — so funny because that has been my theme lately. Silas was there to comfort me afterwards. Like mom says I got through it. Like Deborah says — people come in and out of our lives for reasons we cannot control.", promise:"Praise God. Thank you Jesus. Hallelujah. I am alive and Jesus lives in me. Amen.", scripture:"Proverbs 18:21" },
+  { id:-7, date:"October 6, 2000", title:"He Is In My Prayers", pain:"My intuition told me to call Stephen. I found out he is back in prison — at a county correctional facility since September 13th. It is a shame he has not called his family and that his friends have not notified anyone. I wonder if it would have made a difference if I had let him come live with me.", perspective:"Today is Friday and I absolutely love Fridays. I have no plans but intend to enjoy every moment — movie alone or out with a friend. Stephen is in my prayers and I hope you keep him safe.", promise:"Miriam is excited about her trip to New Jersey and so am I. She has so many people to see — her father, Abigail, Elder Ruth, Hannah and her cousins. Thank you dear Lord for family and friends. I am grateful and shall not take advantage of your merciful love.", scripture:"Psalm 46:1" },
+  { id:-6, date:"October 5, 2000", title:"Why Don't You Do It?", pain:"I am running a little over budget this month. I mailed Bible study documents to family and hope they follow through. Lord continue to bless them all.", perspective:"I completed part of my at-home Bible study — so many personal questions answered. Cornelius and my manager are keeping me busy at work. Mom and Miriam are doing well. Miriam is coming to New Jersey soon and I am so looking forward to seeing her.", promise:"At lunch today my colleague said something that changed everything. I joked that people always say I should have been an attorney. He looked at me seriously and said — why don't you do it? He called me bright, enthusiastic and well spoken. Today I have a different outlook on my career. Thank you God. Amen.", scripture:"Habakkuk 2:2" },
+  { id:-5, date:"October 4, 2000", title:"We Have Always Had Such a Special Relationship", pain:"", perspective:"I am finally getting acclimated at work and everything is running smoothly. I remember being my daughter's age and praying to you dear Lord. We have always had such a special relationship and I have always felt your presence in and around me.", promise:"I have a great job, a roof over my head, and can pay my bills without depending on anyone. I am truly self-sufficient and I owe it all to you. Lord you are everything to me. My life and living is because of you. You hold the power in your hands and you never fail. Have mercy. Amen.", scripture:"Psalm 23:6" },
+  { id:-4, date:"October 3, 2000", title:"See Me As I Visualize Myself", pain:"Last night I cried dear Lord and I know you heard me. It felt as if my soul was crying. Silas brings so many emotions out of me. He gives so much love but takes so much it leaves the other person drained and empty. He lies and denies so much — it is a shame that someone could hold so much pain and offer it to others in the form of love.", perspective:"I feel I am in a very uncomfortable stage in my life and I am turning to you. You are the one I should have been turning to all along — not Priscilla, or my counselor, or Silas. You have all the answers dear God. I should depend on no man. I am from this world but not part of this world. Only you are capable of making a way out of no way.", promise:"I offer it all up to you — life giver, joy bringer. See me past my feelings of apprehension. See me past my need for love from the opposite sex. See me past my laziness. See me past the devil. See me as I visualize myself — making my own happiness and loving myself more and more each day.", scripture:"Philippians 4:13" },
+  { id:-3, date:"October 2, 2000", title:"You Have a Terrific Understanding of the Needs of My Loved Ones", pain:"After watching Final Destination I had the strangest feeling — life-changing and very emotional. Something is shifting and I can't put my finger on it. It is also upsetting the lack of responsibility Caleb takes concerning his daughter. But mom says I just have to live my best and do what is right for Miriam.", perspective:"A research study I assisted on with Cornelius just ended. We had a team dinner at a fine dining restaurant — not many other Black faces in the room, but a very nice experience. Priscilla said they are trying to give this Black girl some culture. She is so funny. Why is Miriam away with my mom? Why is my brother in Georgia? You saw what was needed and took it over.", promise:"I woke up full of love and alive in your spirit. I will just acknowledge that you have a terrific understanding of the needs of my loved ones. I am looking forward to spending time with Miriam. Grant me the serenity to accept things I cannot change. Courage to change the things I can. Amen.", scripture:"Romans 8:28" },
+  { id:-2, date:"September 27, 2000", title:"His Light Shines on My Face Continuously", pain:"Last night I worked on the family newsletter. Although somewhat frustrating using the template, I was taught patience and learned to conform. When I showed it to Silas he was quick to give constructive criticism — it bothered me a little.", perspective:"The newsletter turned out very nice. All seems to be well at home. Miriam did have an ear infection and is now on chewable antibiotics. Thank God for medicine, healthcare and good health plans.", promise:"I know that I am blessed. I am a witness to God's power. He has shone his light on my face and my life continuously without judgement. How could anyone not love such a great God. I will always praise your name dear God. Thank you for another day to smile, love, and laugh. Amen.", scripture:"Psalm 34:5" },
+  { id:-1, date:"September 26, 2000", title:"Praise Be to God in the Highest", pain:"Miriam called this morning — I think she has a cold and is overreacting and upsetting my mom. Lord I am not there to calm my mother and scold my child for being dramatic. Please charge your angels out to them both. Silas is a man with a lot of problems — he wants to love and be loved but is not capable of being true to himself.", perspective:"My family is doing well thanks be to you. I am thankful for the wonderful gift my mother has given me — getting on with my life and seeking my goals. Priscilla sent me a prayer email and I hung it by my desk. I love her and forgive her but will not seek her at this point in my life.", promise:"I have tremendous thanks for all my prayers being answered and the bountiful blessings bestowed upon me. I ask that you continue to bless Silas. I just want to have fun. That is what I will do. Praise be to God in the highest. Amen.", scripture:"Psalm 150:6" },
+  { id:0, date:"September 25, 2000", title:"Lead Me Dear God", pain:"Things are finally slowing down with Silas, at least in my mind. He is such a player and does not realize I am totally aware of his game. My respect level has dropped immensely. I also had unexpected car trouble Friday — and my brother Stephen is missing. We do not know where he is and everyone is worried.", perspective:"Today is a good day dear Lord. I feel alive in your spirit. Friday night I went dancing with Lydia. Saturday I saw The Exorcist with Priscilla. Last night Eli and I rode his motorcycle — I love riding. The companionship is something. Thank you for making the car trouble affordable.", promise:"I thank you for the gift of creativity. I have such elaborate and colorful dreams. In my dream Stephen introduced me to a very interesting title — possibly the title of my future novel. Keep Stephen safe dear Lord. Lead me dear God. Amen.", scripture:"Jeremiah 1:9" },
+  { id:1, date:"September 19, 2000", title:"I Live In This World But I Am Not Of It", pain:"Sometimes there are people and things that are not part of God — and I must remember I do not have to be part of those things.", perspective:"The message in yesterday's Bible study was unction and anointing. The Holy Spirit that lives in us urges us to be a witness and be guided toward what is positive. God put me in the world but I should love Him only and not the world.", promise:"I must abide in the Lord because He will not forsake me. He has kept me for so long in His comfort. Thank you for another blessed day and moment to acknowledge you. Have mercy Jesus. Amen.", scripture:"1 John 2:15" },
+  { id:2, date:"September 18, 2000", title:"Each Trial Opens My Eyes to You", pain:"I find that life is full of wonder and challenges. I am frustrated and even angry dear Lord at times during some of my trials.", perspective:"Each trial makes me a better person and opens my eyes to God. Yesterday was Bible study with Mary and Samuel — it was great as usual. The Bible is not an easy text for me, but with the power of the Lord you have made it easier.", promise:"I am thankful that I can receive your word. I pray that you continue to bless me with new experiences. I will remember John 1 and the message that it holds.", scripture:"James 1:3" },
+  { id:3, date:"September 18, 2000", title:"Life Is Too Short for Grudges", pain:"I could not get a hold of Timothy this weekend. I thought he was avoiding me. My prayers go out to him that he will be careful on the road this morning.", perspective:"Saturday night Miriam, Deborah and I were all in a chat room together — pretty cool. I still can't believe Nathanael is married with a baby on the way. I am so over having an attitude with Marcus. I realize my attitude problem was an issue within myself, not with him.", promise:"Life is too short to hold grudges. I am thankful for the awareness. God has kept me safe and out of harm's way. Watch over my loved ones and bless this day Lord. Amen.", scripture:"Colossians 3:13" },
+  { id:4, date:"August 7, 2013", title:"DYSFUNCTIONAL.COM", pain:"I am so tired of fighting. I have been fighting my entire life. Fighting my father for his attention. Fighting my mother's emotional and psychological abuse. Fighting to be accepted as a good mother. Fighting to keep my sanity. Fighting crazy when it keeps pounding at my front door.", perspective:"When is it time to throw in the towel, say uncle, and just give up? When is enough enough?", promise:"This is my life. You can't make this up. But I am still here. Still writing. Still fighting. And maybe that is the promise — that I haven't stopped.", scripture:"Psalm 34:19" },
+  { id:5, date:"June 13, 1997", title:"I Didn't Know Life Could Be This Good", pain:"I miss my sister Deborah so much. Father's Day is Sunday and Miriam's graduation is Tuesday — and I don't have funds for either.", perspective:"Today was a good day. I am really enjoying my new position. I get to read the paper every day. I didn't know that life could be this good. Miriam will be graduating next week. She is healthy, fully functional and bright.", promise:"Thanks for letting me live through all these months and learn from all the experiences. Next month I turn 25 years old. What an accomplishment. Thanks for coming back into my life and giving me a new beginning. Amen! Thank you Jesus!", scripture:"Lamentations 3:22" },
+  { id:6, date:"May 22, 1997", title:"A Four-Star God, Always On Time", pain:"I was very upset and angry with myself for not completing my project on time.", perspective:"I cannot believe it. I received an A on my Life Arts Paper from the toughest professor in town. I give all the credit to God. Just when I was feeling that Grandmother Naomi did not love me, she called. God bless her. She has a pure heart.", promise:"My God is a four-star God, always on time. He may not always deliver when I ask, but He is always right on time. Since I have given myself to Him, He has not given anything less than blessings in return.", scripture:"Matthew 5:8" },
+];
+
+const THOUGHTS = [
+  { emoji:"🌅", title:"Morning Grace", text:"Each new dawn is God's reminder that His mercies are new every morning. Let today be a fresh start, wrapped in His grace." },
+  { emoji:"🌱", title:"The Quiet Garden", text:"Like seeds planted in good soil, faith grows in the quiet moments — in prayer, in stillness, in trusting what we cannot yet see." },
+  { emoji:"🌳", title:"Roots and Wings", text:"We are rooted in His love so that we may grow freely. Deep roots give us the courage to reach for the sky." },
+  { emoji:"💧", title:"Still Waters", text:"Even in the storm, there is a place of stillness within — the eye of His presence, always calm, always near." },
+  { emoji:"🕊", title:"Bless Them Anyway", text:"The deepest prayer is one offered for those who have wronged you. That kind of love is divine grace flowing through a willing heart." },
+];
+
+const SCRIPTURE_PRAYERS = [
+  { category:"Protection", ref:"Psalm 23:1-4 NKJV", text:"The Lord is my shepherd; I shall not want. He makes me to lie down in green pastures; He leads me beside the still waters. He restores my soul. Yea, though I walk through the valley of the shadow of death, I will fear no evil; for You are with me." },
+  { category:"Strength", ref:"Philippians 4:6-7 NKJV", text:"Be anxious for nothing, but in everything by prayer and supplication, with thanksgiving, let your requests be made known to God; and the peace of God, which surpasses all understanding, will guard your hearts and minds through Christ Jesus." },
+  { category:"Hope", ref:"Isaiah 40:31 NKJV", text:"But those who wait on the Lord shall renew their strength; they shall mount up with wings like eagles, they shall run and not be weary, they shall walk and not faint." },
+  { category:"Guidance", ref:"Proverbs 3:5-6 NKJV", text:"Trust in the Lord with all your heart, and lean not on your own understanding; in all your ways acknowledge Him, and He shall direct your paths." },
+  { category:"Blessing", ref:"Numbers 6:24-26 NKJV", text:"The Lord bless you and keep you; the Lord make His face shine upon you, and be gracious to you; the Lord lift up His countenance upon you, and give you peace." },
+  { category:"Faith", ref:"Jeremiah 29:11 NKJV", text:"For I know the thoughts that I think toward you, says the Lord, thoughts of peace and not of evil, to give you a future and a hope." },
+];
+
+const COMMUNITY_SEED = [
+  { id:1, text:"Please pray for my mother's healing. She is going through a difficult surgery this week.", count:14, time:"2 hours ago" },
+  { id:2, text:"Seeking prayers for peace and guidance as I navigate a major life decision.", count:9, time:"5 hours ago" },
+  { id:3, text:"Lord, please bring comfort to all those who are grieving and lonely tonight.", count:22, time:"Yesterday" },
+];
+
+const F = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Crimson+Pro:ital,wght@0,400;0,500;1,400&display=swap');`;
+
+const CSS = `
+${F}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--sage:#3a6b4a;--sage2:#2d5a3d;--sage3:#1e3d2a;
+--terra:#c4623a;--sun:#e8923a;--sun2:#f5b06a;
+--cream:#fdf7f0;--linen:#f5ede0;--parch:#ede0cc;
+--soft:#6b5f54;--muted:#9a8e84;--shadow:rgba(46,31,20,0.1);
+--fd:'Cormorant Garamond',Georgia,serif;
+--fb:'Crimson Pro',Georgia,serif;
+}
+body{font-family:var(--fb);background:var(--cream);color:#3d2b1f}
+.app{max-width:440px;margin:0 auto;min-height:100vh;background:var(--cream)}
+.hdr{background:linear-gradient(150deg,var(--sage3) 0%,var(--sage2) 50%,#3a5a2a 100%);padding:28px 20px 50px;position:relative;overflow:hidden}
+.hdr::after{content:'';position:absolute;bottom:-22px;left:-5%;width:110%;height:46px;background:var(--cream);border-radius:60% 60% 0 0}
+.hdr-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 15% 85%,rgba(232,146,58,0.3) 0%,transparent 50%),radial-gradient(ellipse at 85% 10%,rgba(196,98,58,0.15) 0%,transparent 45%);pointer-events:none}
+.hdr-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;position:relative;z-index:1}
+.hdr-cross{font-size:22px;opacity:0.9}
+.hdr-date{font-family:var(--fb);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(253,247,240,0.82);font-style:italic}
+.hdr-title{font-family:var(--fd);font-size:28px;font-weight:500;color:var(--cream);line-height:1.1;position:relative;z-index:1;margin-bottom:10px}
+.hdr-sub{display:flex;align-items:center;gap:8px;position:relative;z-index:1}
+.hdr-item{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.hdr-word{font-family:var(--fd);font-style:italic;font-size:13px;color:rgba(253,247,240,0.85);letter-spacing:0.04em}
+.hdr-line{display:block;height:2px;border-radius:2px;width:100%}
+.hdr-dot{color:rgba(253,247,240,0.25);font-size:14px;margin-bottom:5px}
+.nav{display:flex;background:var(--linen);border-bottom:1px solid rgba(180,140,100,0.15);position:sticky;top:0;z-index:20;box-shadow:0 2px 14px var(--shadow)}
+.nb{flex:1;padding:12px 2px 9px;border:none;background:transparent;font-family:var(--fb);font-size:10px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;letter-spacing:0.03em;transition:color 0.2s;border-bottom:2.5px solid transparent;font-weight:500}
+.nb.on{font-weight:600;border-bottom-color:currentColor}
+.nb-icon{font-size:20px;line-height:1;transition:transform 0.2s}
+.nb.on .nb-icon{transform:scale(1.15)}
+.sec{padding:20px 16px 170px;animation:fadeUp 0.3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.sec-title{font-family:var(--fd);font-size:26px;font-weight:600;color:var(--sage)}
+.sec-sub{font-family:var(--fb);font-style:italic;font-size:13px;color:var(--muted);margin:2px 0 18px}
+.jrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.about-btn{background:transparent;border:1.5px solid rgba(58,107,74,0.3);border-radius:20px;padding:5px 13px;font-family:var(--fd);font-size:13px;color:var(--sage);cursor:pointer;font-style:italic;transition:all 0.2s}
+.about-btn:hover{background:rgba(58,107,74,0.08)}
+.jcard{background:white;border-radius:16px;margin-bottom:16px;overflow:hidden;box-shadow:0 3px 14px var(--shadow);border:1px solid rgba(180,140,100,0.08)}
+.jhdr{background:linear-gradient(135deg,var(--sage2),var(--sage3));padding:18px 20px 14px}
+.jdate{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--sun2);margin-bottom:4px;font-weight:500}
+.jtitle{font-family:var(--fd);font-size:19px;font-weight:600;color:var(--cream);line-height:1.2}
+.jbody{padding:18px 20px;background:linear-gradient(180deg,#fffcf8 0%,white 100%)}
+.jsec{margin-bottom:16px}
+.jsec:last-child{margin-bottom:0}
+.jlabel{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:7px;display:flex;align-items:center;gap:7px}
+.jlabel::before{content:'';display:block;width:20px;height:1.5px;background:currentColor;opacity:0.45;border-radius:2px}
+.jlabel.pain{color:#c05050}
+.jlabel.persp{color:var(--terra)}
+.jlabel.prom{color:var(--sage)}
+.jp{font-size:15px;line-height:1.85;color:var(--soft)}
+.vhero{background:linear-gradient(140deg,var(--sage) 0%,var(--sage3) 100%);border-radius:18px;padding:28px 22px 20px;margin-bottom:18px;position:relative;overflow:hidden;box-shadow:0 8px 28px rgba(58,107,74,0.3)}
+.vhero::before{content:'❝';position:absolute;top:2px;left:12px;font-size:90px;color:rgba(255,255,255,0.05);font-family:Georgia,serif;line-height:1}
+.vtext{font-family:var(--fd);font-style:italic;font-size:18px;color:var(--cream);line-height:1.8;position:relative;z-index:1}
+.vref{font-size:11px;color:#a8d4b8;margin-top:14px;letter-spacing:0.08em;text-transform:uppercase}
+.vdots{display:flex;gap:7px;margin-top:12px}
+.vdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);cursor:pointer;transition:background 0.2s}
+.vdot.on{background:var(--cream)}
+.vsave{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.1);border:none;border-radius:20px;color:var(--cream);font-size:17px;padding:3px 10px;cursor:pointer;z-index:2}
+.vsave.saved{color:var(--sun2)}
+.vcard{background:white;border-radius:12px;padding:14px 16px;margin-bottom:9px;border:1px solid rgba(180,140,100,0.08);box-shadow:0 2px 8px var(--shadow);cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.vcref{font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:var(--terra);margin-bottom:4px;font-weight:500}
+.vctext{font-size:13px;font-style:italic;color:var(--soft);line-height:1.6;flex:1}
+.vstar{font-size:18px;color:var(--muted);background:none;border:none;cursor:pointer;flex-shrink:0}
+.vstar.saved{color:#d4913a}
+.saved-card{background:white;border-radius:12px;padding:14px 16px;margin-bottom:9px;border-left:3px solid var(--sun);box-shadow:0 2px 8px var(--shadow)}
+.saved-ref{font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:var(--sun);margin-bottom:5px}
+.saved-text{font-size:13px;font-style:italic;color:var(--soft);line-height:1.6}
+.saved-rm{float:right;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px}
+.divider{height:1px;background:rgba(180,140,100,0.1);margin:16px 0}
+.tcard{background:white;border-radius:14px;padding:20px;margin-bottom:12px;border:1px solid rgba(180,140,100,0.08);box-shadow:0 2px 10px var(--shadow);transition:transform 0.15s}
+.tcard:hover{transform:translateY(-1px)}
+.temoji{font-size:30px;margin-bottom:8px;display:block}
+.ttitle{font-family:var(--fd);font-size:19px;color:#3d2b1f;margin-bottom:7px;font-weight:600}
+.ttext{font-size:15px;line-height:1.8;color:var(--soft)}
+.aibox{background:linear-gradient(135deg,var(--sage2),var(--sage3));border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 6px 22px rgba(30,61,42,0.25)}
+.aititle{font-family:var(--fd);font-size:17px;color:var(--cream);margin-bottom:3px}
+.aisub{font-size:12px;color:rgba(253,247,240,0.5);font-style:italic;margin-bottom:13px}
+.aiinp{width:100%;border:1.5px solid rgba(253,247,240,0.2);border-radius:10px;padding:10px 13px;font-family:var(--fb);font-size:14px;color:var(--cream);background:rgba(255,255,255,0.08);margin-bottom:10px;outline:none;resize:none;height:68px;line-height:1.6}
+.aiinp::placeholder{color:rgba(253,247,240,0.35)}
+.aiinp:focus{border-color:var(--sun2)}
+.airesult{background:rgba(255,255,255,0.08);border-radius:10px;padding:14px;margin-top:12px;border-left:2.5px solid var(--sun2)}
+.aitext{font-family:var(--fb);font-size:15px;color:var(--cream);line-height:1.9}
+.aiload{color:rgba(253,247,240,0.55);font-size:13px;font-style:italic;text-align:center;padding:12px}
+.pcard{background:white;border-radius:14px;padding:18px;margin-bottom:10px;border:1px solid rgba(180,140,100,0.08);box-shadow:0 2px 8px var(--shadow)}
+.ptag{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--terra);margin-bottom:8px;font-weight:600}
+.ptext{font-size:15px;font-style:italic;line-height:1.8;color:var(--soft)}
+.pref{font-size:12px;font-style:italic;color:var(--muted);margin-top:10px;text-align:right}
+.wallform{background:var(--linen);border-radius:16px;padding:18px;border:1px dashed rgba(90,143,106,0.3);margin-bottom:18px}
+.walltitle{font-family:var(--fd);font-size:17px;color:#3d2b1f;margin-bottom:3px}
+.wallsub{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:12px}
+.wallta{width:100%;border:1.5px solid rgba(180,140,100,0.15);border-radius:10px;padding:10px 13px;font-family:var(--fb);font-size:14px;color:#3d2b1f;background:white;resize:none;height:88px;margin-bottom:10px;outline:none;line-height:1.65}
+.wallta:focus{border-color:var(--sage)}
+.anon{font-size:11px;color:var(--muted);font-style:italic;margin-bottom:10px;text-align:center}
+.wcard{background:white;border-radius:14px;padding:15px 17px;margin-bottom:10px;border-left:3px solid var(--sage);box-shadow:0 2px 8px var(--shadow)}
+.wanon{font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.wtext{font-size:14px;font-style:italic;line-height:1.7;color:#3d2b1f}
+.wfooter{display:flex;align-items:center;gap:10px;margin-top:10px}
+.wpray{font-size:11px;font-family:var(--fb);color:var(--sage);background:rgba(58,107,74,0.1);border:none;padding:4px 12px;border-radius:20px;cursor:pointer;transition:background 0.2s}
+.wpray:hover:not(:disabled){background:rgba(58,107,74,0.2)}
+.wpray:disabled{opacity:0.55;cursor:default}
+.wcount{font-size:11px;color:var(--muted)}
+.wtime{font-size:11px;color:var(--muted);margin-left:auto;font-style:italic}
+.clearrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.clearbtn{font-family:var(--fb);font-size:12px;font-style:italic;color:var(--muted);background:transparent;border:1px solid rgba(180,140,100,0.2);border-radius:20px;padding:4px 12px;cursor:pointer;transition:all 0.2s}
+.clearbtn:hover{color:#c05050;border-color:rgba(192,80,80,0.3)}
+.btn-moss{width:100%;background:linear-gradient(135deg,var(--sage),var(--sage3));color:var(--cream);border:none;border-radius:11px;padding:12px;font-family:var(--fd);font-size:15px;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.2s}
+.btn-moss:hover{opacity:0.88}
+.btn-terra{width:100%;background:linear-gradient(135deg,var(--sun),var(--terra));color:white;border:none;border-radius:11px;padding:12px;font-family:var(--fd);font-size:15px;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.2s}
+.btn-terra:hover{opacity:0.88}
+.btn-terra:disabled{opacity:0.4;cursor:not-allowed}
+.overlay{position:fixed;inset:0;background:rgba(30,50,35,0.6);z-index:300;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+.mbox{background:var(--cream);border-radius:22px;padding:28px 24px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.micon{font-size:46px;margin-bottom:12px}
+.mtitle{font-family:var(--fd);font-size:24px;font-weight:600;color:var(--sage);margin-bottom:10px}
+.mtext{font-family:var(--fb);font-size:15px;line-height:1.8;color:var(--soft);margin-bottom:18px}
+.mcoming{background:linear-gradient(135deg,rgba(232,146,58,0.1),rgba(196,98,58,0.08));border-radius:10px;padding:12px 14px;font-family:var(--fb);font-size:14px;color:var(--terra);font-style:italic;margin-bottom:18px;border:1px dashed rgba(196,98,58,0.3)}
+.mwelcome-tag{font-family:var(--fd);font-size:14px;letter-spacing:0.1em;text-transform:uppercase;color:var(--terra);margin-bottom:12px;font-weight:600}
+.mwelcome-text{font-family:var(--fd);font-style:italic;font-size:16px;color:#3d2b1f;line-height:1.9;margin-bottom:20px;text-align:left}
+.mwelcome-text strong{font-style:normal;color:var(--sage);font-weight:600}
+.mbtn{width:100%;background:linear-gradient(135deg,var(--sage),var(--sage3));color:var(--cream);border:none;border-radius:10px;padding:12px;font-family:var(--fd);font-size:15px;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.2s}
+.mbtn:hover{opacity:0.88}
+.footer{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:416px;background:linear-gradient(160deg,var(--sage3) 0%,var(--sage2) 100%);padding:10px 16px 16px;text-align:center;z-index:15;border-radius:22px 22px 0 0;border-top:1px solid rgba(255,255,255,0.08);box-shadow:0 -6px 28px rgba(30,61,42,0.3)}
+.ftext{font-family:var(--fd);font-style:italic;font-size:12px;color:rgba(253,247,240,0.8);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fref{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--sun2);margin-top:3px;opacity:0.9}
+.donate{width:100%;background:linear-gradient(135deg,var(--sun),var(--terra));color:#fff8f0;border:none;border-radius:30px;padding:7px 16px;font-family:var(--fd);font-size:12px;cursor:pointer;font-weight:500;letter-spacing:0.06em;margin-top:9px;box-shadow:0 2px 10px rgba(196,98,58,0.3);transition:transform 0.2s,box-shadow 0.2s;position:relative;overflow:hidden}
+.donate:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(196,98,58,0.4)}
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:var(--sage3);color:var(--cream);padding:10px 22px;border-radius:30px;font-family:var(--fb);font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,0.2);z-index:200;opacity:0;transition:opacity 0.3s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1}
+`;
+
+export default function App() {
+  const [tab, setTab] = useState("journal");
+  const [vi, setVi] = useState(0);
+  const [saved, setSaved] = useState([]);
+  const [community, setCommunity] = useState(COMMUNITY_SEED);
+  const [prayed, setPrayed] = useState({});
+  const [wallText, setWallText] = useState("");
+  const [prayerIntent, setPrayerIntent] = useState("");
+  const [aiPrayer, setAiPrayer] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [toast, setToast] = useState({ msg:"", show:false });
+  const [showDonate, setShowDonate] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const toastRef = useRef(null);
+
+  useEffect(() => { setVi(new Date().getDate() % VERSES.length); }, []);
+
+  const now = new Date();
+  const dateStr = `${now.toLocaleDateString("en-US",{weekday:"short"})} · ${now.toLocaleDateString("en-US",{month:"short"})} ${now.getDate()} · ${now.getFullYear()}`;
+
+  function showToast(msg) {
+    setToast({ msg, show:true });
+    clearTimeout(toastRef.current);
+    toastRef.current = setTimeout(() => setToast(t => ({...t, show:false})), 2600);
+  }
+
+  function toggleSave(v) {
+    if (saved.find(s => s.ref === v.ref)) { setSaved(s => s.filter(x => x.ref !== v.ref)); showToast("Removed from saved"); }
+    else { setSaved(s => [...s, v]); showToast("⭐ Verse saved!"); }
+  }
+
+  function isSaved(ref) { return saved.some(s => s.ref === ref); }
+
+  function submitWall() {
+    if (!wallText.trim()) return;
+    setCommunity(c => [{ id:Date.now(), text:wallText.trim(), count:0, time:"Just now" }, ...c]);
+    setWallText("");
+    showToast("🕊 Shared anonymously");
+  }
+
+  function prayFor(id) {
+    if (prayed[id]) return;
+    setCommunity(c => c.map(p => p.id === id ? {...p, count:p.count+1} : p));
+    setPrayed(p => ({...p, [id]:true}));
+    showToast("🙏 You've prayed for this");
+  }
+
+  async function generatePrayer() {
+    if (!prayerIntent.trim() || aiLoading) return;
+    setAiLoading(true); setAiPrayer("");
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          model:"claude-sonnet-4-20250514", max_tokens:1000,
+          system:"You are a compassionate Christian prayer writer. Write a sincere heartfelt personal prayer in first person. Keep it to 3-5 sentences maximum — short, meaningful and intimate. Use warm conversational language not formal or archaic. End with Amen.",
+          messages:[{role:"user", content:`Please write a prayer for: ${prayerIntent}`}]
+        })
+      });
+      const data = await res.json();
+      setAiPrayer(data.content?.map(b => b.text||"").join("") || "Unable to generate prayer. Please try again.");
+    } catch { setAiPrayer("Could not connect. Please try again."); }
+    setAiLoading(false);
+  }
+
+  const navItems = [
+    { id:"journal", icon:"📓", label:"Journal", color:"#c4623a" },
+    { id:"verse", icon:"✝", label:"Scripture", color:"#7a3a2a" },
+    { id:"thoughts", icon:"🌸", label:"Thoughts", color:"#d4913a" },
+    { id:"prayer", icon:"🕊", label:"Prayer", color:"#5a8f6a" },
+    { id:"community", icon:"🌍", label:"Wall", color:"#3a6b4a" },
+  ];
+
+  return (
+    <>
+      <style>{CSS}</style>
+      <div className="app">
+        <div className="hdr">
+          <div className="hdr-bg" />
+          <div className="hdr-row">
+            <div className="hdr-cross">✝</div>
+            <div className="hdr-date">{dateStr}</div>
+          </div>
+          <div className="hdr-title">Walk in the Light</div>
+          <div className="hdr-sub">
+            <div className="hdr-item"><span className="hdr-word">Pain</span><span className="hdr-line" style={{background:"#ffbdbd"}} /></div>
+            <span className="hdr-dot">·</span>
+            <div className="hdr-item"><span className="hdr-word">Perspective</span><span className="hdr-line" style={{background:"#ffd4a8"}} /></div>
+            <span className="hdr-dot">·</span>
+            <div className="hdr-item"><span className="hdr-word">Promise</span><span className="hdr-line" style={{background:"#b8f0c8"}} /></div>
+          </div>
+        </div>
+
+        <nav className="nav">
+          {navItems.map(n => (
+            <button key={n.id} className={`nb ${tab===n.id?"on":""}`} onClick={() => setTab(n.id)}
+              style={tab===n.id ? {color:n.color, borderBottomColor:n.color} : {}}>
+              <span className="nb-icon" style={
+                n.id==="verse"
+                  ? {color: tab==="verse" ? "#7a3a2a" : "#b08060", fontSize:"19px", fontWeight:"700"}
+                  : tab===n.id ? {filter:"saturate(1.4)"} : {filter:"saturate(0.6) opacity(0.7)"}
+              }>{n.icon}</span>
+              {n.label}
+            </button>
+          ))}
+        </nav>
+
+        {/* WELCOME MODAL */}
+        {showWelcome && (
+          <div className="overlay" onClick={() => setShowWelcome(false)}>
+            <div className="mbox" onClick={e => e.stopPropagation()}>
+              <div className="mwelcome-tag">Welcome to Walk in the Light</div>
+              <div className="mwelcome-text">In 1996, a 24-year-old woman began writing to God. She didn't know she was writing a book. She didn't know she was writing <strong>for you.</strong> Nearly 30 years later, these journals have become Walk in the Light — a testimony that pain has a purpose, perspective brings healing, and <strong>God's promises never fail.</strong></div>
+              <button className="mbtn" onClick={() => setShowWelcome(false)}>Begin Reading ✝</button>
+            </div>
+          </div>
+        )}
+
+        {/* DONATE MODAL */}
+        {showDonate && (
+          <div className="overlay" onClick={() => setShowDonate(false)}>
+            <div className="mbox" onClick={e => e.stopPropagation()}>
+              <div className="micon">💛</div>
+              <div className="mtitle">Support This Ministry</div>
+              <div className="mtext">Your generosity helps keep Walk in the Light growing — more journal entries, more prayers, more lives touched by grace.</div>
+              <div className="mcoming">🌿 Donation options coming soon</div>
+              <button className="mbtn" onClick={() => setShowDonate(false)}>Close</button>
+            </div>
+          </div>
+        )}
+
+        {/* JOURNAL */}
+        {tab==="journal" && (
+          <div className="sec">
+            <div className="jrow">
+              <div><div className="sec-title">My Journal</div><div className="sec-sub" style={{marginBottom:0}}>A record of grace through the years</div></div>
+              <button className="about-btn" onClick={() => setShowWelcome(true)}>✦ About</button>
+            </div>
+            {ENTRIES.map(j => (
+              <div key={j.id} className="jcard">
+                <div className="jhdr">
+                  <div className="jdate">{j.date}{j.scripture ? ` · ${j.scripture}` : ""}</div>
+                  <div className="jtitle">{j.title}</div>
+                </div>
+                <div className="jbody">
+                  {j.pain && <div className="jsec"><div className="jlabel pain">The Pain</div><div className="jp">{j.pain}</div></div>}
+                  {j.perspective && <div className="jsec"><div className="jlabel persp">The Perspective</div><div className="jp">{j.perspective}</div></div>}
+                  {j.promise && <div className="jsec"><div className="jlabel prom">The Promise</div><div className="jp">{j.promise}</div></div>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* SCRIPTURE */}
+        {tab==="verse" && (
+          <div className="sec">
+            <div className="sec-title">Scripture</div>
+            <div className="sec-sub">Let it dwell in you richly</div>
+            <div className="vhero">
+              <button className={`vsave ${isSaved(VERSES[vi].ref)?"saved":""}`} onClick={() => toggleSave(VERSES[vi])}>{isSaved(VERSES[vi].ref)?"★":"☆"}</button>
+              <div className="vtext">{VERSES[vi].text}</div>
+              <div className="vref">— {VERSES[vi].ref}</div>
+              <div className="vdots">{VERSES.map((_,i) => <div key={i} className={`vdot ${i===vi?"on":""}`} onClick={() => setVi(i)} />)}</div>
+            </div>
+            {saved.length > 0 && <>
+              <div className="sec-title" style={{fontSize:16,marginBottom:12}}>⭐ Saved</div>
+              {saved.map(v => (
+                <div key={v.ref} className="saved-card">
+                  <button className="saved-rm" onClick={() => toggleSave(v)}>✕</button>
+                  <div className="saved-ref">{v.ref}</div>
+                  <div className="saved-text">"{v.text}"</div>
+                </div>
+              ))}
+              <div className="divider" />
+            </>}
+            <div className="sec-title" style={{fontSize:16,marginBottom:12}}>All Verses</div>
+            {VERSES.map((v,i) => (
+              <div key={i} className="vcard" onClick={() => setVi(i)}>
+                <div style={{flex:1}}><div className="vcref">{v.ref}</div><div className="vctext">"{v.text}"</div></div>
+                <button className={`vstar ${isSaved(v.ref)?"saved":""}`} onClick={e => {e.stopPropagation();toggleSave(v);}}>{isSaved(v.ref)?"★":"☆"}</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* THOUGHTS */}
+        {tab==="thoughts" && (
+          <div className="sec">
+            <div className="sec-title">Daily Thoughts</div>
+            <div className="sec-sub">Seeds of wisdom for today</div>
+            {THOUGHTS.map((t,i) => (
+              <div key={i} className="tcard">
+                <span className="temoji">{t.emoji}</span>
+                <div className="ttitle">{t.title}</div>
+                <div className="ttext">{t.text}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* PRAYER */}
+        {tab==="prayer" && (
+          <div className="sec">
+            <div className="sec-title">Prayer</div>
+            <div className="sec-sub">Words lifted to heaven</div>
+            <div className="aibox">
+              <div className="aititle">🕊 Personal Prayer Generator</div>
+              <div className="aisub">Share what's on your heart and receive a prayer written just for you</div>
+              <textarea className="aiinp" placeholder="What would you like to bring to the Lord today?" value={prayerIntent} onChange={e => setPrayerIntent(e.target.value)} />
+              <button className="btn-terra" onClick={generatePrayer} disabled={aiLoading || !prayerIntent.trim()}>{aiLoading ? "Praying..." : "🕊 Generate My Prayer"}</button>
+              {aiLoading && <div className="aiload">Lifting your request to the Lord...</div>}
+              {aiPrayer && !aiLoading && <div className="airesult"><div className="aitext">{aiPrayer}</div></div>}
+            </div>
+            <div className="sec-title" style={{fontSize:16,marginBottom:13}}>Prayers from Scripture</div>
+            {SCRIPTURE_PRAYERS.map((p,i) => (
+              <div key={i} className="pcard">
+                <div className="ptag">{p.category}</div>
+                <div className="ptext">"{p.text}"</div>
+                <div className="pref">— {p.ref}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* WALL */}
+        {tab==="community" && (
+          <div className="sec">
+            <div className="sec-title">Prayer Wall</div>
+            <div className="sec-sub">Bearing one another's burdens</div>
+            <div className="wallform">
+              <div className="walltitle">Share Anonymously</div>
+              <div className="wallsub">A prayer, an experience, a story — your words may heal someone tonight</div>
+              <textarea className="wallta" placeholder="Share your prayer request, experience, or perspective..." value={wallText} onChange={e => setWallText(e.target.value)} />
+              <div className="anon">🔒 Fully anonymous — no name, no trace</div>
+              <button className="btn-moss" onClick={submitWall}>✝ Share to Prayer Wall</button>
+            </div>
+            <div className="clearrow">
+              <div className="sec-title" style={{fontSize:16,marginBottom:0}}>Community Prayers</div>
+              <button className="clearbtn" onClick={() => {setCommunity(COMMUNITY_SEED);showToast("Wall cleared");}}>Clear My Prayers</button>
+            </div>
+            {community.map(p => (
+              <div key={p.id} className="wcard">
+                <div className="wanon">Anonymous · {p.time}</div>
+                <div className="wtext">"{p.text}"</div>
+                <div className="wfooter">
+                  <button className="wpray" onClick={() => prayFor(p.id)} disabled={!!prayed[p.id]}>{prayed[p.id]?"✓ Prayed":"🕊 I prayed for this"}</button>
+                  <span className="wcount">{p.count} {p.count===1?"prayer":"prayers"}</span>
+                  <span className="wtime">{p.time}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className={`toast ${toast.show?"show":""}`}>{toast.msg}</div>
+
+        <div className="footer">
+          <div><div className="ftext">"{VERSES[vi].text}"</div><div className="fref">— {VERSES[vi].ref}</div></div>
+          <button className="donate" onClick={() => setShowDonate(true)}>This ministry runs on grace — and your generosity</button>
+        </div>
+      </div>
+    </>
+  );
+}
