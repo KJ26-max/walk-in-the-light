@@ -475,6 +475,7 @@ function renderVerse(){
   const s=saved.some(x=>x.ref===v.ref);
   $('vsave-btn').textContent=s?'★':'☆';$('vsave-btn').className='vsave'+(s?' saved':'');
   $('vdots').innerHTML=VERSES.map((_,i)=>`<button class="vdot${i===vi?' on':''}" onclick="setV(${i})"></button>`).join('');
+  $('all-verses').innerHTML=VERSES.map((v,i)=>`<div class="vcard" onclick="setV(${i})"><div style="flex:1"><div class="vcref">${v.ref}</div><div class="vctext">"${v.text}"</div></div><button class="vstar${isSaved(v.ref)?' saved':''}" onclick="event.stopPropagation();toggleSave('${v.ref.replace(/'/g,"\\'")}')">${isSaved(v.ref)?'★':'☆'}</button></div>`).join('');
   $('footer-verse').textContent='"'+v.text+'"';$('footer-ref').textContent='— '+v.ref;
   const ss=$('saved-section');
   if(saved.length===0){ss.innerHTML='';return;}
